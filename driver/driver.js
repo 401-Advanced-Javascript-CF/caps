@@ -1,57 +1,30 @@
 'use strict';
 
+const client = require('socket.io-client');
+// const socket = client('ws://localhost:3001');
 
-// const event = require('../caps/event.js');
+const driverSocket = client('ws://localhost:3001/driver');
 
-// event.on('pickup', handler);
+driverSocket.on('pickup', payload => {
+    setTimeout(() => {
+        console.log(`picked up ${payload.orderId}`);
+        driverSocket.emit('in-transit', payload);
+    }, 1000)
 
-// function handler(order){
-//     setTimeout(() => {
-//         // console.log(order);
-//         console.log(`DRIVER: picked up ${order.orderId}`);
-//         event.emit('in-transit', order);
-//     }, 1000)
-// }
+});
+driverSocket.on('in-transit', payload => {
+    setTimeout(() => {
+        console.log(`delivered ${payload.orderId}`);
+        driverSocket.emit('delivered', payload);
+    }, 2000)
 
-// event.on('in-transit', deliverHandler);
-
-// function deliverHandler(order){
-//     setTimeout(() => {
-//         console.log(`DRIVER: delivered up ${order.orderId}`);
-//         event.emit('delivered', order);
-//     }, 3000)
-// }
-const net = require('net');
-
-const client = new net.Socket();
-const port = 3000;
-const host = 'localhost';
-
-client.connect(port, host, () => console.log(`connected to Driver at port ${port} on host ${host}`));
-
-client.on('data', data => {
-    let parsed = JSON.parse(data);
-    if(parsed.event === 'pickup'){
-        let object = {event: 'DRIVER', payload: `picked up ${parsed.payload.orderId}`};
-        let message = JSON.stringify(object);
-        setTimeout(() => {
-            client.write(message);
-            parsed.event = 'in-transit';
-            let object = JSON.stringify(parsed);
-            // console.log(object);
-            client.write(object);
-        }, 1000);
-    }
-    if(parsed.event === 'in-transit'){
-        let object = {event: 'DRIVER', payload: `delivered up ${parsed.payload.orderId}`};
-        let message = JSON.stringify(object);
-        setTimeout(() => {
-            client.write(message);
-            parsed.event = 'delivered';
-            let object = JSON.stringify(parsed);
-            // console.log(object);
-            client.write(object);
-        }, 3000);
-    }
-
+});
+driverSocket.on('connect', () => {
+    console.log('i am connected');
 })
+// socket.on('pickup', payload => {
+//     console.log('i am  connected');
+//     console.log(payload);
+//     payload.event = 'in-transit';
+//     socket.emit('in-transit', payload);
+// });
