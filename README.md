@@ -87,4 +87,5 @@ not done
 
 
 ## Change Log
+1.2: *converted to socket.io from net. made all adjustment and refactoring. app is currently in a functioning state* - 4 Nov 2020
 1.1: *initial lab setup and finished, jsut basic listeners and triggers* - 1 Nov 2020

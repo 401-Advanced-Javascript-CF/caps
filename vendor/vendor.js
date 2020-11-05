@@ -39,30 +39,31 @@ array.push(store2);
 //     }, 500)
 // }
 
-const net = require('net');
 
-const client = new net.Socket();
+const client = require('socket.io-client');
+const socket = client('ws://localhost:3001');
 
-const host = 'localhost';
-const port = 3000;
+const vendorSocket = client('ws://localhost:3001/vendor');
 
-client.connect(port, host, () => console.log(`vendor up on ${host} and port ${port}`));
-const message = JSON.stringify({event:'pickup', payload: array[number]});
-setInterval(() => {
-    client.write(message);
-}, 5000);
+vendorSocket.on('connect', () => {
+    console.log('i am connected');
+    setInterval(() => {
+        vendorSocket.emit('pickup', array[number]);
+    }, 5000)
 
-client.on('data', data => {
-    // console.log(data);
-    let parser = parseIncoming(data);
-    if(parser.event === 'delivered'){
-        let thankYou = JSON.stringify({event:'Thank you', payload: `Thank you for delivering ${parser.payload.orderId}`})
-        client.write(thankYou);
-    }
-})
+});
 
-function parseIncoming(message){
-    let parse = JSON.parse(message);
-    return parse;
-}
+vendorSocket.on('delivered', payload => {
+    setTimeout(() => {
+        console.log(`Thank you for the delivery of ${payload.orderId}`);
+    }, 1000);
+});
+
+// socket.on('connect', () => {
+//     console.log('i am  connected');
+//     socket.emit('pickup', array[number]);
+// });
+
+
+
 
