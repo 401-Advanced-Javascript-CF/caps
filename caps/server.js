@@ -14,7 +14,13 @@ server.on('connection', socket => {
   console.log(`Welcome ${socket.id}`);
   socket.on('pickup', payload => {
     server.emit('pickup', payload);
-  })
+  });
+
+  socket.on('delivered', payload => {
+    console.log('EVENT', {event: 'delivered', payload: payload});
+    vendorServer.emit('delivered', payload);
+  });
+
 });
 
 vendorServer.on('connection', socket => {
@@ -33,8 +39,7 @@ driverServer.on('connection', socket => {
     driverServer.emit('in-transit', payload);
   });
 
-  socket.on('delivered', payload => {
-    console.log('EVENT', {event: 'delivered', payload: payload});
-    vendorServer.emit('delivered', payload);
-  });
+
+
+
 })
