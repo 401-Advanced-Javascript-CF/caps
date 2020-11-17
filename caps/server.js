@@ -10,6 +10,7 @@ const vendorServer = server.of('/vendor');
 const driverServer = server.of('/driver');
 
 
+
 server.on('connection', socket => {
   console.log(`Welcome ${socket.id}`);
   socket.on('pickup', payload => {
@@ -38,8 +39,4 @@ driverServer.on('connection', socket => {
     console.log('EVENT', {event: 'in-transit', payload: payload});
     driverServer.emit('in-transit', payload);
   });
-
-
-
-
 })
